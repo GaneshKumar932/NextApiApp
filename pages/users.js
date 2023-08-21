@@ -59,17 +59,6 @@ export async function getStaticProps() {
   }
 }
 
-// export async function getStaticProps() {
-//     // Fetch data on the server side
-//     const res = await fetch("https://jsonplaceholder.typicode.com/users");
-//     const users = await res.json();
-//     // console.log(users);
-//     return {
-//       props: {
-//         users: { users },
-//       },
-//   }
-//  }
 
 const Users = ( {users} ) => {
    
@@ -97,3 +86,14 @@ const Users = ( {users} ) => {
   );
 };
 export default Users;
+// export async function getStaticProps() {
+//     // Fetch data on the server side
+//     const res = await fetch("https://jsonplaceholder.typicode.com/users");
+//     const users = await res.json();
+//     // console.log(users);
+//     return {
+//       props: {
+//         users: { users },
+//       },
+//   }
+//  }
