@@ -40,3 +40,26 @@ a{
     background-color: rgb(150, 150, 255);
     text-align: center;
 }
+.usersTable {
+    margin: auto;
+    padding: auto;
+    width: 50%;
+}
+table,th,thead,tbody{
+    border: 1px solid black;
+    background-color: rgb(246, 237, 227);
+    height: 25px;
+}
+button {
+    background-color: inherit;
+    border: 0;
+}
+/* .popup{
+    display: block;
+    position: fixed;
+    align-items: center;
+    margin-top: 0;
+    margin: auto;
+    padding: 100px;
+    background-color: rgba(14, 18, 23, 0.64);
+} */
