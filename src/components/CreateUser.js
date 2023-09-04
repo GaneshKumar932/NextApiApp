@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const UserForm = ({ handleCreateUser }) => {
+const UserForm = ({ handleCreateUser, hideview }) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -39,6 +39,7 @@ const UserForm = ({ handleCreateUser }) => {
           <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} />
         </div>
         <button type="submit">Create</button>
+        <button onClick={hideview}>Cancel</button>
       </form>
     </div>
   );

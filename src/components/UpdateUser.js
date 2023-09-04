@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const UpdateUser = ({user, handleUpdateUser}) => {
+const UpdateUser = ({user, handleUpdateUser, hideview}) => {
   const [newName, setNewName] = useState("");
   const [newUserName, setNewUserName] = useState("");
   const [newEmail, setNewEmail] = useState("");
@@ -10,9 +10,20 @@ const UpdateUser = ({user, handleUpdateUser}) => {
   const handleSubmit2 = (e) => {
     e.preventDefault();
     handleUpdateUser(user.id,newName, newUserName, newEmail, newPhone, newWebsite);
-    setUpdatedUserName('');
-    setUpdatedEmail('');
+    setNewName("");
+    setNewUserName('');
+    setNewEmail('');
+    setNewPhone('');
+    setNewWebsite('');
   };
+  const cancelupdate = () => {
+    hideview();
+    setNewName("");
+    setNewUserName('');
+    setNewEmail('');
+    setNewPhone('');
+    setNewWebsite('');
+  }
 
   return (
     <div className='popup'>
@@ -39,6 +50,7 @@ const UpdateUser = ({user, handleUpdateUser}) => {
           <input type="text"  placeholder={user.website} onChange={(e) => setNewWebsite(e.target.value)} />
         </div>
         <button type="submit">Update</button>
+        <button onClick={cancelupdate}>Cancel</button>
       </form>
     </div>
   )
