@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 
 export async function getStaticProps() {
   try {
-    insertUsersIntoDatabase();
+    // insertUsersIntoDatabase();
     const users = await prisma.User.findMany();
     return {
       props: { users },
@@ -142,7 +142,7 @@ const uploaddata = async (efile) => {
       <table style={{ width:"100%" }}>
         <thead>
           <tr>
-            <th style={{ width:"10%" }}>Id</th>
+            <th style={{ width:"10%" }}>No</th>
             <th style={{ width:"30%" }}>Name</th>
             <th style={{ width:"30%" }}>UserName</th>
             <th style={{ width:"10%" }}>View</th>
@@ -151,9 +151,9 @@ const uploaddata = async (efile) => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {users.map((user, index) => (
             <tr key={user.id}>
-              <th>{user.id}</th>
+              <th>{index+1}</th>
               <th>{user.name}</th>
               <th>{user.username}</th>
               <th>
