@@ -1,13 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import Link from "next/link";
-import XLSX from "xlsx";
-import { read, utils, writeFile } from 'xlsx'
 import { useEffect, useState } from "react";
 import UserDetail from "../components/UserDetail";
 import UserForm from "../components/CreateUser";
 import UpdateUser from "../components/UpdateUser";
-import { insertUsersIntoDatabase } from "./api/insertUsersIntoDatabase";
-
+import { read, utils, writeFile, writeFileSync } from "xlsx";
+import XLSX from "xlsx";
+import * as ExcelJS from 'exceljs'; 
 const prisma = new PrismaClient();
 
 export async function getStaticProps() {
@@ -29,12 +27,12 @@ const Users = ({ users: initialUsers }) => {
   const [openForm, setOpenForm] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [viewUser, setViewUser] = useState(false);
-  const [efile , setEfile] = useState(null);
+  const [efile, setEfile] = useState(null);
   const hideview = () => {
     setViewUser(false);
     setOpenForm(false);
-    setUpdateUser(false)
-  }
+    setUpdateUser(false);
+  };
 
   const handleCreateUser = async (name, username, email, phone, website) => {
     try {
@@ -43,7 +41,7 @@ const Users = ({ users: initialUsers }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({name, username, email, phone, website}),
+        body: JSON.stringify({ name, username, email, phone, website }),
       });
 
       if (response.ok) {
@@ -57,7 +55,14 @@ const Users = ({ users: initialUsers }) => {
     }
   };
 
-  const handleUpdateUser = async (userId,newName, newUserName, newEmail, newPhone, newWebsite) => {
+  const handleUpdateUser = async (
+    userId,
+    newName,
+    newUserName,
+    newEmail,
+    newPhone,
+    newWebsite
+  ) => {
     try {
       const response = await fetch(`/api/users/${userId}`, {
         method: "PUT",
@@ -69,7 +74,7 @@ const Users = ({ users: initialUsers }) => {
           username: newUserName,
           email: newEmail,
           phone: newPhone,
-          website: newWebsite
+          website: newWebsite,
         }),
       });
 
@@ -94,39 +99,74 @@ const Users = ({ users: initialUsers }) => {
       console.error("Error deleting user:", error);
     }
   };
- 
-const handleExcelUpload = async (e) => {
-  e.preventDefault();
-  try {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const data = e.target.result;
-      const workbook = read(data, { type: "array" });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = utils.sheet_to_json(worksheet);
-      setEfile(jsonData);
-      console.log(efile);
-      // Assuming jsonData contains an array of objects with user data
-      // Loop through the data and insert it into the database
-      
-    };
-    reader.readAsArrayBuffer(e.target.files[0]);
-  } catch (error) {
-    console.error("Error uploading Excel file:", error);
-  }
-};
-const uploaddata = async (efile) => {
-  for (const user of efile) {
-    await handleCreateUser(
-      user.name,
-      user.username,
-      user.email,
-      user.phone,
-      user.website
-    );
-  }
-  setEfile(null);
-}
+
+  const handleExcelUpload = async (e) => {
+    e.preventDefault();
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const data = e.target.result;
+        const workbook = read(data, { type: "array" });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = utils.sheet_to_json(worksheet);
+        setEfile(jsonData);
+        console.log(efile);
+        // Assuming jsonData contains an array of objects with user data
+        // Loop through the data and insert it into the database
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    } catch (error) {
+      console.error("Error uploading Excel file:", error);
+    }
+  };
+  const uploaddata = async (efile) => {
+    for (const user of efile) {
+      await handleCreateUser(
+        user.name,
+        user.username,
+        user.email,
+        user.phone,
+        user.website
+      );
+    }
+    setEfile(null);
+  };
+
+  const downloadLastFiveUsers = (users) => {
+    const lastFiveUsers = users.slice(-5);
+    const selectdReport = "User List Report";
+    const workbook = new ExcelJS.Workbook();
+    const FileName = selectdReport.replace(" ", "_") + ".xlsx";
+    const worksheet = workbook.addWorksheet(selectdReport);
+    worksheet.columns = [
+      { header: "Userid", key: "id" },
+      { header: "Name", key: "name" },
+      { header: "UserName", key: "username" },
+      { header: "Email", key: "email" },
+      { header: "Phone", key: "phone" },
+      { header: "Website", key: "website" },
+    ];
+    console.log(lastFiveUsers);
+    lastFiveUsers.map((user) => {
+      worksheet.addRow({
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        website: user.website,
+      });
+    }) // Get the last 5 users
+    workbook.xlsx.writeBuffer().then((data) => {
+      var blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' });
+      var url = window.URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      document.body.appendChild(a);
+      a.href = url;
+      a.download = FileName;
+      a.click();
+    })
+  };
 
   if (!users) {
     return (
@@ -139,105 +179,134 @@ const uploaddata = async (efile) => {
     <>
       <h1 style={{ textAlign: "center" }}>User List</h1>
       <div className="usersTable">
-      <table style={{ width:"100%" }}>
-        <thead>
-          <tr>
-            <th style={{ width:"10%" }}>No</th>
-            <th style={{ width:"30%" }}>Name</th>
-            <th style={{ width:"30%" }}>UserName</th>
-            <th style={{ width:"10%" }}>View</th>
-            <th style={{ width:"10%" }}>Update</th>
-            <th style={{ width:"10%" }}>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user, index) => (
-            <tr key={user.id}>
-              <th>{index+1}</th>
-              <th>{user.name}</th>
-              <th>{user.username}</th>
-              <th>
-                <button
-                  onClick={() => {
-                    setSelectedUser(user);
-                    setViewUser(true);
-                  }}
-                >
-                  View
-                </button>
-              </th>
-              <th>
-                <button
-                  onClick={() => {
-                    setSelectedUser(user);
-                    setUpdateUser((prevState) => !prevState);
-                  }}
-                >
-                  Update
-                </button>
-              </th>
-              <th>
-                <button onClick={() => handleDeleteUser(user.id)}>
-                  Delete
-                </button>
-              </th>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      </div>
-      <button onClick={() => setOpenForm(true)}>Create User</button><br></br><br></br><br></br>
-      <form >
-      <label>Upload file</label>
-      <br></br><br></br>
-      <input
-                type="file"
-                name="upload"
-                id="upload"
-                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                onChange={(e) => handleExcelUpload(e)}
-              />
-      </form>
-      {selectedUser && viewUser && <UserDetail user={selectedUser} hideview={hideview} />}
-      {updateUser && (
-        <UpdateUser user={selectedUser} handleUpdateUser={handleUpdateUser} hideview={hideview} />
-      )}
-
-      {openForm && <UserForm handleCreateUser={handleCreateUser} hideview={hideview} />}
-      {efile && (
-        <>
-        <h1 style={{ textAlign: "center" }}>Excel File Data</h1>
-        <div className="usersTable">
-        <table style={{ width:"100%" }}>
+        <table style={{ width: "100%" }}>
           <thead>
             <tr>
-              <th style={{ width:"10%" }}>No</th>
-              <th style={{ width:"20%" }}>Name</th>
-              <th style={{ width:"30%" }}>UserName</th>
-              <th style={{ width:"10%" }}>Email</th>
-              <th style={{ width:"20%" }}>Mobile</th>
-              <th style={{ width:"10%" }}>Website</th>
+              <th style={{ width: "10%" }}>No</th>
+              <th style={{ width: "30%" }}>Name</th>
+              <th style={{ width: "30%" }}>UserName</th>
+              <th style={{ width: "10%" }}>View</th>
+              <th style={{ width: "10%" }}>Update</th>
+              <th style={{ width: "10%" }}>Delete</th>
             </tr>
           </thead>
           <tbody>
-            {efile.map((user) => (
-              <tr key={user.no}>
-                <th>{user.no}</th>
+            {users.map((user, index) => (
+              <tr key={user.id}>
+                <th>{index + 1}</th>
                 <th>{user.name}</th>
                 <th>{user.username}</th>
-                <th>{user.email}</th>
-                <th>{user.phone}</th>
-                <th>{user.website}</th>
-               
+                <th>
+                  <button
+                    className="bg-inherit border-0"
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setViewUser(true);
+                    }}
+                  >
+                    View
+                  </button>
+                </th>
+                <th>
+                  <button
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setUpdateUser((prevState) => !prevState);
+                    }}
+                  >
+                    Update
+                  </button>
+                </th>
+                <th>
+                  <button onClick={() => handleDeleteUser(user.id)}>
+                    Delete
+                  </button>
+                </th>
               </tr>
             ))}
           </tbody>
         </table>
-        <button onClick={(e)=>{e.preventDefault();uploaddata(efile)}}>Upload</button>
-        </div>
+      </div>
+      <button onClick={() => downloadLastFiveUsers(users)}>
+        Download Last 5 Users
+      </button>
+      <br></br>
+      <br></br>
+
+      <button
+        className="bg-blue-500 text-white p-4"
+        onClick={() => setOpenForm(true)}
+      >
+        Create User
+      </button>
+      <br></br>
+      <br></br>
+      <br></br>
+      <form>
+        <label>Upload file</label>
+        <br></br>
+        <br></br>
+        <input
+          type="file"
+          name="upload"
+          id="upload"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          onChange={(e) => handleExcelUpload(e)}
+        />
+      </form>
+      {selectedUser && viewUser && (
+        <UserDetail user={selectedUser} hideview={hideview} />
+      )}
+      {updateUser && (
+        <UpdateUser
+          user={selectedUser}
+          handleUpdateUser={handleUpdateUser}
+          hideview={hideview}
+        />
+      )}
+
+      {openForm && (
+        <UserForm handleCreateUser={handleCreateUser} hideview={hideview} />
+      )}
+      {efile && (
+        <>
+          <h1 style={{ textAlign: "center" }}>Excel File Data</h1>
+          <div className="usersTable">
+            <table style={{ width: "100%" }}>
+              <thead>
+                <tr>
+                  <th style={{ width: "10%" }}>No</th>
+                  <th style={{ width: "20%" }}>Name</th>
+                  <th style={{ width: "30%" }}>UserName</th>
+                  <th style={{ width: "10%" }}>Email</th>
+                  <th style={{ width: "20%" }}>Mobile</th>
+                  <th style={{ width: "10%" }}>Website</th>
+                </tr>
+              </thead>
+              <tbody>
+                {efile.map((user) => (
+                  <tr key={user.no}>
+                    <th>{user.no}</th>
+                    <th>{user.name}</th>
+                    <th>{user.username}</th>
+                    <th>{user.email}</th>
+                    <th>{user.phone}</th>
+                    <th>{user.website}</th>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                uploaddata(efile);
+              }}
+            >
+              Upload
+            </button>
+          </div>
         </>
-      )
-      }
+      )}
     </>
   );
 };

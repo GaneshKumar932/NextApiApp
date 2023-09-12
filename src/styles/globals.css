@@ -1,3 +1,4 @@
+
 .nav-bar{
     display: flex;
     flex-wrap: nowrap;
@@ -50,16 +51,3 @@ table,th,thead,tbody{
     background-color: rgb(246, 237, 227);
     height: 25px;
 }
-button {
-    background-color: inherit;
-    border: 0;
-}
-/* .popup{
-    display: block;
-    position: fixed;
-    align-items: center;
-    margin-top: 0;
-    margin: auto;
-    padding: 100px;
-    background-color: rgba(14, 18, 23, 0.64);
-} */
