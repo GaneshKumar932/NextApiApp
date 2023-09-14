@@ -26,7 +26,8 @@ const UpdateUser = ({user, handleUpdateUser, hideview}) => {
   }
 
   return (
-    <div className='popup'>
+    <div className='black fixed left-0 top-0 w-full h-full flex items-center justify-center'>
+    <div className='w-1/5 bg-white p-5 rounded'>
       <h2>Update User</h2>
       <form onSubmit={handleSubmit2}>
       <div>
@@ -52,6 +53,7 @@ const UpdateUser = ({user, handleUpdateUser, hideview}) => {
         <button type="submit">Update</button>
         <button onClick={cancelupdate}>Cancel</button>
       </form>
+    </div>
     </div>
   )
 }

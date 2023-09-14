@@ -131,6 +131,9 @@ const Users = ({ users: initialUsers }) => {
     }
     setEfile(null);
   };
+  const cancelupload = () => {
+    setEfile(null);
+  };
 
   const downloadLastFiveUsers = (users) => {
     const lastFiveUsers = users.slice(-5);
@@ -139,12 +142,12 @@ const Users = ({ users: initialUsers }) => {
     const FileName = selectdReport.replace(" ", "_") + ".xlsx";
     const worksheet = workbook.addWorksheet(selectdReport);
     worksheet.columns = [
-      { header: "Userid", key: "id" },
-      { header: "Name", key: "name" },
-      { header: "UserName", key: "username" },
-      { header: "Email", key: "email" },
-      { header: "Phone", key: "phone" },
-      { header: "Website", key: "website" },
+      { header: "id", key: "id" },
+      { header: "name", key: "name" },
+      { header: "username", key: "username" },
+      { header: "email", key: "email" },
+      { header: "phone", key: "phone" },
+      { header: "website", key: "website" },
     ];
     console.log(lastFiveUsers);
     lastFiveUsers.map((user) => {
@@ -203,7 +206,7 @@ const Users = ({ users: initialUsers }) => {
                   <th>{user.username}</th>
                   <th>
                     <button
-                      className="bg-inherit border-0"
+                      
                       onClick={() => {
                         setSelectedUser(user);
                         setViewUser(true);
@@ -238,7 +241,7 @@ const Users = ({ users: initialUsers }) => {
           </button>
         </div>
         <button
-          className="bg-blue-500 text-white p-4"
+          className="bg-black text-white"
           onClick={() => setOpenForm(true)}
         >
           Create User
@@ -267,7 +270,7 @@ const Users = ({ users: initialUsers }) => {
         {openForm && (
           <UserForm handleCreateUser={handleCreateUser} hideview={hideview} />
         )}
-        {efile && <ExcelPreview efile={efile} uploaddata={uploaddata} />}
+        {efile && <ExcelPreview efile={efile} uploaddata={uploaddata} cancelupload={cancelupload} />}
       </div>
     </>
   );

@@ -1,3 +1,7 @@
+@tailwind components;
+@tailwind utilities;
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
 a{
     text-decoration: none;
     color: white;
@@ -10,14 +14,14 @@ a{
     padding: 0;
     display: flex;
     justify-content: flex-start;
-    background-color:blue;
+    background-color:#1677ff;
     font-weight: bolder;
     font-family: 'Times New Roman', Times, serif;
     font-size: larger;
     border: 1px solid black
 }
 .nav-links{
-    background-color: blue;
+    background-color: #1677ff;
     display: inline;
     text-align: center;
     width: 10%;
@@ -72,12 +76,12 @@ thead {
     color: red;
 }
 tbody {
-    color: blue;
+    color: #1677ff;
 }
 button,#upload{
     margin-top: 20px;
     color: white;
-    background-color: blue;
+    background-color:#1677ff;
     border: 1px solid black;
     border-radius: 10px;
     padding: 5px;
@@ -87,4 +91,30 @@ th > button {
     text-decoration: none;
     border: 0;
     width: 100%;
+}
+.carousel{
+    align-items: center;
+    text-align: center;
+    background-color: #FEA116;
+}
+.cccc{
+    width: 500px;
+    align-items: center;
+    text-align: center;
+}
+.black {
+    background-color: hsla(0, 0%, 0%, 0.582);
+  } 
+
+.fa{
+    -webkit-font-smoothing: antialiased;
+    font-family: "Font Awesome 5 Free";
+    font-size: 2em;
+    font-weight: 900px;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    color: white;
 }

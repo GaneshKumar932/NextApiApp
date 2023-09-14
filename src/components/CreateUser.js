@@ -15,7 +15,8 @@ const UserForm = ({ handleCreateUser, hideview }) => {
 
   return (
     
-    <div className='popup'>
+    <div className='black fixed left-0 top-0 w-full h-full flex items-center justify-center'>
+    <div className='w-1/5 bg-white p-5 rounded'>
       <h2>Create User</h2>
       <form onSubmit={handleSubmit}>
       <div>
@@ -41,6 +42,7 @@ const UserForm = ({ handleCreateUser, hideview }) => {
         <button type="submit">Create</button>
         <button onClick={hideview}>Cancel</button>
       </form>
+      </div>
     </div>
   );
 };
