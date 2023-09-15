@@ -3,9 +3,12 @@ import { useState } from "react";
 import UserDetail from "../components/UserDetail";
 import UserForm from "../components/CreateUser";
 import UpdateUser from "../components/UpdateUser";
-import { read, utils} from "xlsx";
+import { read, utils } from "xlsx";
 import * as ExcelJS from "exceljs";
 import ExcelPreview from "../components/ExcelPreview";
+import { Table, Pagination, Select } from "antd";
+// import 'antd/dist/reset.css';
+
 const prisma = new PrismaClient();
 
 export async function getStaticProps() {
@@ -28,6 +31,82 @@ const Users = ({ users: initialUsers }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [viewUser, setViewUser] = useState(false);
   const [efile, setEfile] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage, setUsersPerPage] = useState(5);
+  const [tableData, setTableData] = useState(initialUsers);
+  const handlePageChange = (page, pageSize) => {
+    setCurrentPage(page);
+    setUsersPerPage(pageSize);
+  };
+  const handleUsersPerPageChange = (value) => {
+    setUsersPerPage(value);
+    setCurrentPage(1);
+  };
+  const startIndex = (currentPage - 1) * usersPerPage;
+  const endIndex = startIndex + usersPerPage;
+
+  const currentData = tableData.slice(startIndex, endIndex);
+  const columns = [
+
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+    },
+    {
+      title: "Website",
+      dataIndex: "website",
+      key: "website",
+    },
+    {
+      title: "Actions",
+      dataIndex: "actions",
+      key: "actions",
+      render: (text, user) => (
+        <span>
+          <button
+            onClick={() => {
+              setSelectedUser(user);
+              setViewUser(true);
+            }}
+          >
+            View
+          </button>
+          <button
+            onClick={() => {
+              setSelectedUser(user);
+              setUpdateUser((prevState) => !prevState);
+            }}
+          >
+            Update
+          </button>
+          <button onClick={() => handleDeleteUser(user.id)}>Delete</button>
+        </span>
+      ),
+    },
+  ];
+
   const hideview = () => {
     setViewUser(false);
     setOpenForm(false);
@@ -184,7 +263,26 @@ const Users = ({ users: initialUsers }) => {
     <>
       <div className="userspage">
         <h1 style={{ textAlign: "center" }}>User List</h1>
-        <div className="usersTable">
+
+        <Table
+         className="custom-table"
+          dataSource={currentData}
+          columns={columns}
+          size="small"
+          pagination={false} // Disable default pagination
+        />
+        <Pagination
+        className="custom-pagination"
+          current={currentPage}
+          pageSize={usersPerPage}
+          total={tableData.length}
+          showSizeChanger
+          showQuickJumper
+          pageSizeOptions={["5", "10"]} // You can add more options if needed
+          onChange={handlePageChange}
+          onShowSizeChange={handleUsersPerPageChange}
+        />
+        {/* <div className="usersTable">
           <table style={{ width: "100%" }}>
             <thead>
               <tr>
@@ -234,7 +332,7 @@ const Users = ({ users: initialUsers }) => {
               ))}
             </tbody>
           </table>
-        </div>
+        </div> */}
         <div>
           <button onClick={() => downloadLastFiveUsers(users)}>
             Download Last 5 Users
@@ -247,7 +345,7 @@ const Users = ({ users: initialUsers }) => {
           Create User
         </button>
         <form>
-          <label>Upload Users List : </label>
+          <label>Upload Users List :</label>
           <input
             type="file"
             name="upload"
@@ -270,7 +368,13 @@ const Users = ({ users: initialUsers }) => {
         {openForm && (
           <UserForm handleCreateUser={handleCreateUser} hideview={hideview} />
         )}
-        {efile && <ExcelPreview efile={efile} uploaddata={uploaddata} cancelupload={cancelupload} />}
+        {efile && (
+          <ExcelPreview
+            efile={efile}
+            uploaddata={uploaddata}
+            cancelupload={cancelupload}
+          />
+        )}
       </div>
     </>
   );

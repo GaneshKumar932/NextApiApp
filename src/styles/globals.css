@@ -93,12 +93,11 @@ th > button {
     width: 100%;
 }
 .carousel{
-    align-items: center;
-    text-align: center;
     background-color: #FEA116;
+    color: white;
 }
 .cccc{
-    width: 500px;
+    width: 400px;
     align-items: center;
     text-align: center;
 }
@@ -118,3 +117,56 @@ th > button {
     line-height: 1;
     color: white;
 }
+
+.custom-table {
+    border: 1px solid black !important;
+    border-style: none !important;
+    margin: auto;
+    border-radius: 10px;
+    width: 70%;
+    
+  }
+  
+  /* Table header styles */
+  .custom-table .ant-table-thead th {
+    background-color: #1677ff !important;
+    color: white !important;
+    border: 1px solid black !important;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px;
+  }
+  
+  
+  /* Alternate row color */
+.custom-table .ant-table-tbody tr:nth-child(odd) { 
+    background-color: #f2f2f2;
+  }
+   
+  /* Table cell styles */
+  .custom-table .ant-table-tbody td {
+    padding: 8px;
+    border: 1px solid black !important;
+  }
+  
+  /* Pagination styles */
+  /* .custom-pagination .ant-pagination {
+    margin-top: 16px;
+    text-align: center;
+  } */
+  
+  /* Custom button styles */
+  /* .custom-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  } */
+  
+  /* Style for specific button in a column */
+  /* .custom-table .custom-button:hover {
+    background-color: #0056b3;
+  } */
+  
